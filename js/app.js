@@ -70,9 +70,9 @@ const render = function() {
 const updateBoard = function() {
     board.forEach((square, index) => {
      
-        board[index] = squareEls[index];
-
+        board[index] = squareEls[index]
     })
+   console.log(board)
 }
 
 const updateMessage = function() {
@@ -84,7 +84,7 @@ const updateMessage = function() {
        messageEl.textContent = `Ready To Play - |${turn}'s turn|`
     }
     else if(winner === false && tie === false) {
-        messageEl.textContent = `Tally (O: ${tally.O} X: ${tally.X}) - |${turn}'s turn|`
+        messageEl.textContent = `Wins = (O: ${tally.O} X: ${tally.X}) - |${turn}'s turn|`
 
     }
     else if (winner === false && tie === true) {
@@ -105,53 +105,65 @@ const handleClick = function(event) {
     if (board[squareIndex].textContent !== '' || winner === true || tie === true) {
         return
     }
-    
     placePiece(squareIndex);
     checkForWinner();
     checkForTie();
+    if (!winner && !tie) {
     switchPlayerTurn();
-    render();
-
+    }
+    updateMessage()
 }
 
 const placePiece = function(index) {
 
     board.splice(index, 1, turn);
-    squareEls[index].textContent = turn;
-
+    squareEls[index].textContent = board[index]
+    
 }
 
 
 const checkForWinner = function() {
+    
     winningCombos.forEach((combo) => {
+        const comboX = combo.every((piece) => {
+            return board[piece] === 'X'
+        })
 
-        if (squareEls[combo[0]].textContent === 'X' && squareEls[combo[1]].textContent === 'X' && squareEls[combo[2]].textContent === 'X') {
-            winner = true
+        const comboO = combo.every((piece) => {
+            return board[piece] === 'O'
+        })
+
+         if (comboX === true) {
+            winner = true;
+            tally.X += 1;
         }
-        else if (squareEls[combo[0]].textContent === 'O' && squareEls[combo[1]].textContent === 'O' && squareEls[combo[2]].textContent === 'O') {
-            winner = true
-        }
-        
+        else if (comboO === true) {
+            winner = true;
+            tally.O += 1;
+        }        
+
     })
 }
 
 const checkForTie = function() {
-
-    if (winner !== true && tally.X === 5 || tally.O === 5) {
+    const allBoard = board.some((one) => {
+        return one.textContent === ''
+    })
+    if (winner === false && allBoard === false) {
             tie = true
         }
-
+console.log(allBoard)
 }
 
 const switchPlayerTurn = function() {
 
 if (turn === 'X' && winner === false && tie === false) {
         turn = 'O';
-        tally.X += 1;
+        //tally.X += 1;
     }
     else if (turn === 'O' && winner === false && tie === false) {
         turn = 'X';
-        tally.O += 1;
+        //tally.O += 1;
     }
 
 }
@@ -161,16 +173,13 @@ const reset = function() {
     squareEls.forEach((el) => {
         el.textContent = ''
     })
-
-    tally.O = 0
-    tally.X = 0
     
     init()
 
 }
 
 init();
-
+console.log(board)
 /*----------------------------- Event Listeners -----------------------------*/
 
 squareEls.forEach(function (el) {
