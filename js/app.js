@@ -30,7 +30,7 @@ const winningCombos = [
     3 4 5
     6 7 8 
     */
-
+    const tally = {O: 0, X: 0};
     
 /*---------------------------- Variables (state) ----------------------------*/
 
@@ -38,17 +38,12 @@ let board;
 let turn;
 let winner;
 let tie;
-let squareIndex;
-tally = {O: 0, X: 0}
 
 /*------------------------ Cached Element References ------------------------*/
 
 const squareEls = document.querySelectorAll('.sqr');
 const messageEl = document.querySelector('#message');
 const resetBtnEl = document.querySelector('#reset');
-
-console.log(squareEls);
-console.log(messageEl);
     
 /*-------------------------------- Functions --------------------------------*/
 
@@ -68,19 +63,17 @@ const render = function() {
 }
 
 const updateBoard = function() {
-    board.forEach((square, index) => {
+    board.forEach((value, index) => {
      
-        board[index] = squareEls[index]
+    squareEls[index].textContent = value;
+
     })
-   console.log(board)
 }
 
 const updateMessage = function() {
-    const check = board.every((square) => {
-        return square.textContent === ''
-    })
+    
 
-    if (winner === false && tie === false && check === true) {
+    if (winner === false && tie === false && board.includes('')) {
        messageEl.textContent = `Ready To Play - |${turn}'s turn|`
     }
     else if(winner === false && tie === false) {
@@ -100,7 +93,7 @@ const updateMessage = function() {
 
 const handleClick = function(event) {
     
-    squareIndex = event.target.id;
+    const squareIndex = event.target.id;
     
     if (board[squareIndex].textContent !== '' || winner === true || tie === true) {
         return
@@ -111,13 +104,12 @@ const handleClick = function(event) {
     if (!winner && !tie) {
     switchPlayerTurn();
     }
-    updateMessage()
+    render()
 }
 
 const placePiece = function(index) {
 
-    board.splice(index, 1, turn);
-    squareEls[index].textContent = board[index]
+    board[index] = turn;
     
 }
 
@@ -133,37 +125,32 @@ const checkForWinner = function() {
             return board[piece] === 'O'
         })
 
-         if (comboX === true) {
+         if (!winner && comboX) {
             winner = true;
-            tally.X += 1;
+            tally.X ++;
         }
-        else if (comboO === true) {
+        else if (!winner && comboO) {
             winner = true;
-            tally.O += 1;
+            tally.O ++;
         }        
 
     })
 }
 
 const checkForTie = function() {
-    const allBoard = board.some((one) => {
-        return one.textContent === ''
-    })
-    if (winner === false && allBoard === false) {
-            tie = true
-        }
-console.log(allBoard)
+    
+    if (!winner && !board.includes('')) {
+        tie = true
+    }
 }
 
 const switchPlayerTurn = function() {
 
 if (turn === 'X' && winner === false && tie === false) {
         turn = 'O';
-        //tally.X += 1;
     }
     else if (turn === 'O' && winner === false && tie === false) {
         turn = 'X';
-        //tally.O += 1;
     }
 
 }
@@ -179,7 +166,7 @@ const reset = function() {
 }
 
 init();
-console.log(board)
+
 /*----------------------------- Event Listeners -----------------------------*/
 
 squareEls.forEach(function (el) {
